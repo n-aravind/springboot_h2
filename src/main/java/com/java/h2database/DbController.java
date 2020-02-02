@@ -1,13 +1,12 @@
 package com.java.h2database;
 
+import com.java.h2database.model.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,11 +28,11 @@ public class DbController {
                         rs.getString("career")));
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/add", params = {"first_name", "last_name", "career"})
-    public String addBillionaire(@RequestParam String first_name, @RequestParam String last_name, @RequestParam String career) {
+    @RequestMapping(method = RequestMethod.POST, path = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String addBillionaire(@RequestBody UpdateRequest updateRequest) {
 
         try {
-            jdbcTemplate.batchUpdate("insert into billionaires (first_name, last_name, career) VALUES (?,?,?)", Collections.singletonList(new Object[]{first_name, last_name, career}));
+            jdbcTemplate.batchUpdate("insert into billionaires (first_name, last_name, career) VALUES (?,?,?)", Collections.singletonList(new Object[]{updateRequest.getFirstName(), updateRequest.getLastName(), updateRequest.getCareer()}));
         } catch (Exception e) {
             log.error(e.getMessage());
             return "Data not inserted into the table";
